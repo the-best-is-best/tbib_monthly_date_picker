@@ -5,8 +5,6 @@
 /// github: https://github.com/iamvivekkaushik/
 /// ***
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tbib_monthly_date_picker/tap/tap.dart';
@@ -34,7 +32,6 @@ class DateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log("DateWidget.build $date");
     return InkWell(
       child: Container(
         width: width,
