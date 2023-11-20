@@ -48,10 +48,10 @@ class DateWidget extends StatelessWidget {
             children: <Widget>[
               Text(
                   DateFormat("E", locale).format(date).toUpperCase(), // WeekDay
-                  style: dayTextStyle),
+                  style: dateTextStyle),
               const SizedBox(height: 10),
               Text(date.day.toString(), // Date
-                  style: dateTextStyle),
+                  style: dayTextStyle),
               const SizedBox(height: 10),
               for (var dateHasEvent in datesHasEvent) ...{
                 if (dateHasEvent.year == date.year &&

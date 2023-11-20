@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:tbib_monthly_date_picker/extra/date_picker_config.dart';
 import 'package:tbib_monthly_date_picker/tbib_monthly_date_picker.dart';
 import 'package:tbib_monthly_date_picker/widgets/render_dates.dart';
 
@@ -81,11 +82,20 @@ class DatePickerController {
 }
 
 class DatePickerTimeLine extends StatefulWidget {
+  // /// Width of the selector
+  // final double width;
+
   /// Height of the selector
   final double height;
 
+  /// DatePicker Controller
+  final DatePickerController controller;
+
   /// Callback function for when a different date is selected
   final DateChangeListener? onDateChange;
+
+  /// add style config
+  final DatePickerConfig datePickerConfig;
 
   /// Locale for the calendar default: en_us
   final String locale;
@@ -93,26 +103,17 @@ class DatePickerTimeLine extends StatefulWidget {
   const DatePickerTimeLine({
     // required this.currentMonthDate,
     super.key,
+    // this.width = context,
     this.height = 200,
-    this.controller,
-    this.dayTextStyle = defaultDayTextStyle,
-    this.dateTextStyle = defaultDateTextStyle,
-    this.selectedTextColor = Colors.black,
-    this.selectionColor = MyColors.defaultSelectionColor,
-    this.deactivatedColor = MyColors.defaultDeactivatedColor,
-    this.disableDatesAfterToday = true,
-    this.datesHasEvent = const [],
-    this.initialSelectedDate,
-    this.activeDates,
-    this.inactiveDates,
+    required this.controller,
+    this.datePickerConfig = const DatePickerConfig(),
+    // this.monthTextStyle = defaultMonthTextStyle,
+
     this.onDateChange,
 
     // this.animateToDate,
     this.locale = "en_US",
-  }) : assert(
-            activeDates == null || inactiveDates == null,
-            "Can't "
-            "provide both activated and deactivated dates List at the same time.");
+  });
 
   @override
   State<StatefulWidget> createState() => _DatePickerState();
@@ -170,9 +171,9 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                       widget.onDateChange?.call(_currentDate);
                     });
                   },
-                  child: const FaIcon(
+                  child: FaIcon(
                     FontAwesomeIcons.chevronLeft,
-                    color: Colors.black,
+                    color: widget.datePickerConfig.dateTextStyle.color,
                   ),
                 ),
                 GestureDetector(
@@ -210,29 +211,23 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                                       WidgetsBinding.instance
                                           .addPostFrameCallback((_) {
                                         widget.controller
-                                            ?.setDatePickerState(this);
+                                            .setDatePickerState(this);
 
-                                        widget.controller?.animateToSelection();
+                                        widget.controller.animateToSelection();
                                       });
                                     }
                                   },
-                                  child: const Text(
-                                    "ok",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ))
+                                  style: widget.datePickerConfig.buttonStyle,
+                                  child: widget
+                                      .datePickerConfig.labelButtonDatePicker)
                             ],
                           ),
                         ),
                       ),
                     );
                   },
-                  child: Text(
-                    DateFormat("MMMM yyyy").format(_currentDate),
-                    style: const TextStyle(fontSize: 24, color: Colors.black),
-                  ),
+                  child: Text(DateFormat("MMMM yyyy").format(_currentDate),
+                      style: widget.datePickerConfig.dateSelectedStyle),
                 ),
                 GestureDetector(
                   onTap: dateNow.month == _currentDate.month &&
@@ -260,7 +255,7 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                     color: dateNow.month == _currentDate.month &&
                             dateNow.year == _currentDate.year
                         ? Colors.grey
-                        : Colors.black,
+                        : widget.datePickerConfig.dateTextStyle.color,
                   ),
                 ),
               ],
@@ -283,7 +278,7 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                 date = DateTime(date0.year, date0.month, date0.day);
 
                 bool isDeactivated = false;
-                if (widget.disableDatesAfterToday) {
+                if (widget.datePickerConfig.disableDatesAfterToday) {
                   if (date.year == DateTime.now().year &&
                       date.month == DateTime.now().month) {
                     if (date.day > DateTime.now().day) {
@@ -293,8 +288,9 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                 }
 
                 // check if this date needs to be deactivated for only DeactivatedDates
-                if (widget.inactiveDates != null) {
-                  for (DateTime inactiveDate in widget.inactiveDates!) {
+                if (widget.datePickerConfig.inactiveDates != null) {
+                  for (DateTime inactiveDate
+                      in widget.datePickerConfig.inactiveDates!) {
                     if (DateUtils.isSameDay(date, inactiveDate)) {
                       isDeactivated = true;
                       break;
@@ -303,9 +299,10 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                 }
 
                 // check if this date needs to be deactivated for only ActivatedDates
-                if (widget.activeDates != null) {
+                if (widget.datePickerConfig.activeDates != null) {
                   isDeactivated = true;
-                  for (DateTime activateDate in widget.activeDates!) {
+                  for (DateTime activateDate
+                      in widget.datePickerConfig.activeDates!) {
                     if (DateUtils.isSameDay(date, activateDate)) {
                       isDeactivated = false;
                       break;
@@ -313,14 +310,12 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                   }
                 }
                 // Check if this date is the one that is currently selected
-                bool isSelected = _currentDate != null
-                    ? DateUtils.isSameDay(date, _currentDate)
-                    : false;
+                bool isSelected = DateUtils.isSameDay(date, _currentDate);
 
                 // Return the Date Widget
                 return DateWidget(
                   date: date,
-                  datesHasEvent: widget.datesHasEvent,
+                  datesHasEvent: widget.datePickerConfig.datesHasEvent,
                   // monthTextStyle: isDeactivated
                   //     ? deactivatedMonthStyle
                   //     : isSelected
@@ -330,16 +325,17 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                       ? deactivatedDateStyle
                       : isSelected
                           ? selectedDateStyle
-                          : widget.dateTextStyle,
+                          : widget.datePickerConfig.dateTextStyle,
                   dayTextStyle: isDeactivated
                       ? deactivatedDayStyle
                       : isSelected
                           ? selectedDayStyle
-                          : widget.dayTextStyle,
+                          : widget.datePickerConfig.dayTextStyle,
                   width: 60,
                   locale: widget.locale,
-                  selectionColor:
-                      isSelected ? widget.selectionColor : Colors.transparent,
+                  selectionColor: isSelected
+                      ? widget.datePickerConfig.selectionColor
+                      : Colors.transparent,
                   onDateSelected: (selectedDate) {
                     // Don't notify listener if date is deactivated
                     if (isDeactivated) return;
@@ -364,27 +360,28 @@ class _DatePickerState extends State<DatePickerTimeLine> {
   void initState() {
     // Init the calendar locale
     initializeDateFormatting(widget.locale, null);
+
     // Set initial Values
 
-    widget.controller?.setDatePickerState(this);
-    _currentDate = widget.initialSelectedDate ?? _currentDate;
-    selectedDateStyle =
-        widget.dateTextStyle.copyWith(color: widget.selectedTextColor);
+    widget.controller.setDatePickerState(this);
+    _currentDate = widget.datePickerConfig.initialSelectedDate ?? _currentDate;
+    selectedDateStyle = widget.datePickerConfig.dateTextStyle
+        .copyWith(color: widget.datePickerConfig.selectedTextColor);
     // selectedMonthStyle =
     //     widget.monthTextStyle.copyWith(color: widget.selectedTextColor);
-    selectedDayStyle =
-        widget.dayTextStyle.copyWith(color: widget.selectedTextColor);
+    selectedDayStyle = widget.datePickerConfig.dayTextStyle
+        .copyWith(color: widget.datePickerConfig.selectedTextColor);
 
-    deactivatedDateStyle =
-        widget.dateTextStyle.copyWith(color: widget.deactivatedColor);
+    deactivatedDateStyle = widget.datePickerConfig.dateTextStyle
+        .copyWith(color: widget.datePickerConfig.deactivatedColor);
     // deactivatedMonthStyle =
     //     widget.monthTextStyle.copyWith(color: widget.deactivatedColor);
-    deactivatedDayStyle =
-        widget.dayTextStyle.copyWith(color: widget.deactivatedColor);
+    deactivatedDayStyle = widget.datePickerConfig.dayTextStyle
+        .copyWith(color: widget.datePickerConfig.deactivatedColor);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.controller?.setDatePickerState(this);
+      widget.controller.setDatePickerState(this);
 
-      widget.controller?.animateToSelection();
+      widget.controller.animateToSelection();
     });
     super.initState();
   }
