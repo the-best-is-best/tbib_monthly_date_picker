@@ -81,54 +81,8 @@ class DatePickerController {
 }
 
 class DatePickerTimeLine extends StatefulWidget {
-  /// m for int month , y for year
-  // final ({int m, int y}) currentMonthDate;
-
-  // final DateTime? animateToDate;
-
-  /// Contains the list of dates that have events
-  final List<DateTime> datesHasEvent;
-
-  /// disable any dates after today
-  final bool disableDatesAfterToday;
-
-  // /// Width of the selector
-  // final double width;
-
   /// Height of the selector
   final double height;
-
-  /// DatePicker Controller
-  final DatePickerController? controller;
-
-  /// Text color for the selected Date
-  final Color selectedTextColor;
-
-  /// Background color for the selector
-  final Color selectionColor;
-
-  /// Text Color for the deactivated dates
-  final Color deactivatedColor;
-
-  // /// TextStyle for Month Value
-  // final TextStyle monthTextStyle;
-
-  /// TextStyle for day Value
-  final TextStyle dayTextStyle;
-
-  /// TextStyle for the date Value
-  final TextStyle dateTextStyle;
-
-  /// Current Selected Date
-  final DateTime? /*?*/ initialSelectedDate;
-
-  /// Contains the list of inactive dates.
-  /// All the dates defined in this List will be deactivated
-  final List<DateTime>? inactiveDates;
-
-  /// Contains the list of active dates.
-  /// Only the dates in this list will be activated.
-  final List<DateTime>? activeDates;
 
   /// Callback function for when a different date is selected
   final DateChangeListener? onDateChange;
@@ -139,21 +93,20 @@ class DatePickerTimeLine extends StatefulWidget {
   const DatePickerTimeLine({
     // required this.currentMonthDate,
     super.key,
-    // this.width = context,
-    this.height = 160,
+    this.height = 200,
     this.controller,
-    // this.monthTextStyle = defaultMonthTextStyle,
     this.dayTextStyle = defaultDayTextStyle,
     this.dateTextStyle = defaultDateTextStyle,
-    this.selectedTextColor = Colors.white,
+    this.selectedTextColor = Colors.black,
     this.selectionColor = MyColors.defaultSelectionColor,
     this.deactivatedColor = MyColors.defaultDeactivatedColor,
+    this.disableDatesAfterToday = true,
+    this.datesHasEvent = const [],
     this.initialSelectedDate,
     this.activeDates,
     this.inactiveDates,
     this.onDateChange,
-    this.disableDatesAfterToday = true,
-    this.datesHasEvent = const [],
+
     // this.animateToDate,
     this.locale = "en_US",
   }) : assert(
@@ -219,7 +172,7 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                   },
                   child: const FaIcon(
                     FontAwesomeIcons.chevronLeft,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
                 GestureDetector(
@@ -267,7 +220,7 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                                     "ok",
                                     style: TextStyle(
                                         fontSize: 20,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                         fontWeight: FontWeight.bold),
                                   ))
                             ],
@@ -277,9 +230,8 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                     );
                   },
                   child: Text(
-                    DateFormat("MMMM yyyy")
-                        .format(_currentDate ?? DateTime.now()),
-                    style: const TextStyle(fontSize: 24, color: Colors.white),
+                    DateFormat("MMMM yyyy").format(_currentDate),
+                    style: const TextStyle(fontSize: 24, color: Colors.black),
                   ),
                 ),
                 GestureDetector(
@@ -308,7 +260,7 @@ class _DatePickerState extends State<DatePickerTimeLine> {
                     color: dateNow.month == _currentDate.month &&
                             dateNow.year == _currentDate.year
                         ? Colors.grey
-                        : Colors.white,
+                        : Colors.black,
                   ),
                 ),
               ],
