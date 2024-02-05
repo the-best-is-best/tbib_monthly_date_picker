@@ -4,14 +4,14 @@ version: 1.0.0
 homepage: https://github.com/the-best-is-best/tbib_monthly_date_picker
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
   font_awesome_flutter: ^10.6.0
-  intl: ^0.18.1
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -22,7 +22,6 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter: null
-
 # To add assets to your package, add an assets section, like this:
 # assets:
 #   - images/a_dot_burr.jpeg
